@@ -76,7 +76,12 @@ let del_all_children node =
 
 (* check if the current node can be accessed by the current connection with rperm permissions *)
 let check_perm node connection request =
-	Perms.check connection request node.perms
+	try
+		Perms.check connection request node.perms
+	with
+	| Define.Permission_denied ->
+		Logs.info "io" "  Failed on: %s" (get_name node);
+		raise Define.Permission_denied
 
 (* check if the current node is owned by the current connection *)
 let check_owner node connection =
